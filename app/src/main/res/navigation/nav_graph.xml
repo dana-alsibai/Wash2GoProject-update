@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <!--<fragment
+        android:id="@+id/permissionFragment"
+        android:name="project.sheridancollege.wash2goproject.ui.permission.PermissionFragment"
+        android:label="fragment_permission"
+        tools:layout="@layout/fragment_permission" >
+    </fragment>-->
+    <!--<fragment
+        android:id="@+id/mapsFragment"
+        android:name="project.sheridancollege.wash2goproject.ui.maps.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" >
+        <argument
+            android:name="latitude"
+            app:argType="float" />
+        <argument android:name="longitude"
+            app:argType="float" />
+        <action
+            android:id="@+id/action_mapsFragment_to_permissionFragment"
+            app:destination="@id/permissionFragment" />
+    </fragment>-->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="project.sheridancollege.wash2goproject.ui.authentication.LoginFragment"
+        android:label="login_fragment"
+        tools:layout="@layout/login_fragment" >
+        <action
+            android:id="@+id/action_loginFragment_to_registerActivity"
+            app:destination="@id/registerFragment" />
+        <!--<action
+            android:id="@+id/action_loginFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />-->
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="project.sheridancollege.wash2goproject.ui.authentication.RegisterFragment"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register"
+        >
+
+    </fragment>
+
+</navigation>
