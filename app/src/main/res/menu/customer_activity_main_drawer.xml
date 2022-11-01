@@ -13,10 +13,10 @@
             android:icon="@drawable/ic_action_account_circle"
             android:title="@string/my_profile" />-->
 
-        <item
+        <!--<item
             android:id="@+id/nav_feedback"
             android:icon="@drawable/ic_action_feedback"
-            android:title="@string/feedback" />
+            android:title="@string/feedback" />-->
         <item
             android:id="@+id/nav_customer_logout"
             android:icon="@drawable/ic_action_logout"
