@@ -163,6 +163,7 @@ class CustomerHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerC
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 binding.distanceTv.text =  "${binding.distanceSeekbar.progress} KM"
                 distance = p1
+                customerHomeViewModel.getOnlineDetailers()
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {
