@@ -8,6 +8,15 @@
             android:id="@+id/nav_customer_home"
             android:icon="@drawable/ic_action_home"
             android:title="@string/menu_home" />
+    <!--    <item
+            android:id="@+id/nav_my_profile"
+            android:icon="@drawable/ic_action_account_circle"
+            android:title="@string/my_profile" />-->
+
+        <item
+            android:id="@+id/nav_feedback"
+            android:icon="@drawable/ic_action_feedback"
+            android:title="@string/feedback" />
         <item
             android:id="@+id/nav_customer_logout"
             android:icon="@drawable/ic_action_logout"

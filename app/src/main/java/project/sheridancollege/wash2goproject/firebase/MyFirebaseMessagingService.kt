@@ -74,7 +74,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val pm = packageManager
         val launchIntent = pm.getLaunchIntentForPackage("project.sheridancollege.wash2goproject")
 
-        val pendingIntent = PendingIntent.getActivity(this, 0, launchIntent,0)
+        val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.getActivity(this, 0, launchIntent,PendingIntent.FLAG_IMMUTABLE)
+        } else {
+            PendingIntent.getActivity(this, 0, launchIntent,0)
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager =

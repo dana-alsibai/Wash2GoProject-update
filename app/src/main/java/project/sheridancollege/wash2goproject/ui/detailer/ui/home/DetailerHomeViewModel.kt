@@ -1,5 +1,6 @@
 package project.sheridancollege.wash2goproject.ui.detailer.ui.home
 
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +10,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.getValue
 import project.sheridancollege.wash2goproject.AppClass
 import project.sheridancollege.wash2goproject.common.*
 import project.sheridancollege.wash2goproject.firebase.FCMHandler
@@ -191,9 +193,24 @@ class DetailerHomeViewModel : ViewModel() {
 
                     return@OnCompleteListener
                 }
-
-
                 _order.postValue(order)
+            })
+    }
+
+
+    fun updateTotalEarning(detailerId: String,totalEarning: Int) {
+        AppClass.databaseReference.child(Constants.DETAILER_SERVICE_PRICE)
+            .child(detailerId)
+            .child("totalEarning")
+            .setValue(totalEarning)
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Toast.makeText(
+                        AppClass.instance, task.exception?.localizedMessage, Toast.LENGTH_LONG
+                    ).show()
+                    return@OnCompleteListener
+                }
+                Log.e("ViewModel","Update Total Earning = "+ task.isSuccessful)
             })
     }
 

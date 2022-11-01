@@ -22,10 +22,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.gson.Gson
 import project.sheridancollege.wash2goproject.R
-import project.sheridancollege.wash2goproject.common.AppEnum
-import project.sheridancollege.wash2goproject.common.Order
-import project.sheridancollege.wash2goproject.common.User
-import project.sheridancollege.wash2goproject.common.UserStatus
+import project.sheridancollege.wash2goproject.common.*
 import project.sheridancollege.wash2goproject.databinding.FragmentDetailerHomeBinding
 import project.sheridancollege.wash2goproject.ui.detailer.bottomsheet.JobBottomSheetFragment
 import project.sheridancollege.wash2goproject.ui.maps.MapUtil
@@ -56,6 +53,7 @@ class DetailerHomeFragment : Fragment(), OnMapReadyCallback, BottomSheetClickLis
     private  var completedJobList: ArrayList<Order> =  ArrayList()
     private  var declinedJobList: ArrayList<Order> = ArrayList()
     private  var order: Order? = null
+    private var detailerServicesPrice : DetailerServicesPrice? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -139,8 +137,15 @@ class DetailerHomeFragment : Fragment(), OnMapReadyCallback, BottomSheetClickLis
 
             detailerHomeViewModel.sendNotificationToCustomer(order)
 
-            if(order?.status == AppEnum.DECLINED.toString() || order?.status == AppEnum.COMPLETED.toString()){
-                order = null
+            when (order?.status){
+                AppEnum.DECLINED.toString() -> {
+                    order = null
+                }
+                AppEnum.COMPLETED.toString() ->{
+                    val totalEarning = detailerServicesPrice?.totalEarning.toString().toInt() + order?.totalPrice.toString().toInt()
+                    detailerHomeViewModel.updateTotalEarning(order?.detailerId.toString(),totalEarning)
+                    order = null
+                }
             }
 
             setOrderView()
@@ -219,6 +224,7 @@ class DetailerHomeFragment : Fragment(), OnMapReadyCallback, BottomSheetClickLis
         binding.helloTitleTv.text = "Hello ${user?.firstName} !"
 
         detailerHomeViewModel.detailerServicePrice.observe(viewLifecycleOwner) {
+            detailerServicesPrice = it
             binding.ratingBar.rating = it.rating.toFloat()
             binding.ratingTv.text = "(${it.rating.toFloat()})"
             binding.totalEarningTv.text = "${it.totalEarning}$"
