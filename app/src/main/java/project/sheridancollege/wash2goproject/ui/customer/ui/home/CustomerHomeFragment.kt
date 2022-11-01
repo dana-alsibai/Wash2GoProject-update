@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -49,12 +50,15 @@ class CustomerHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerC
     private lateinit var lastLocation: Location
     private lateinit var locationRequest: LocationRequest
     private var locationUpdateState = false
-    private var user: User?=null
+    private var user: User? = null
     private lateinit var locationCallback: LocationCallback
     val markerList: ArrayList<MarkerOptions> = ArrayList()
     private lateinit var customerHomeViewModel: CustomerHomeViewModel
     private lateinit var activeMarker: Marker
     private lateinit var detailerDetailDialog: DetailerDetailsDialog
+
+    private var distance : Int  = 10
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -109,16 +113,16 @@ class CustomerHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerC
                     val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding)
                     mMap.animateCamera(cameraUpdate)
                 } else {
-                    val currentLatLng = LatLng(lastLocation.latitude, lastLocation.longitude)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
+                   // val currentLatLng = LatLng(lastLocation.latitude, lastLocation.longitude)
+                   // mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
                 }
             }
         }
 
         user = SharedPreferenceUtils.getUserDetails()
 
-        if(user?.fcmToken == "N/A"){
-            customerHomeViewModel.user.observe(viewLifecycleOwner){
+        if (user?.fcmToken == "N/A") {
+            customerHomeViewModel.user.observe(viewLifecycleOwner) {
                 user = it
                 SharedPreferenceUtils.saveUserDetails(user)
             }
@@ -143,7 +147,7 @@ class CustomerHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 bundle.putString("detailer_name", activeMarker.title)
                 bundle.putString("detailer_user_id", activeMarker.tag.toString())
                 bundle.putString("detailer_service_price", Gson().toJson(it))
-                bundle.putParcelable("customerLocation",lastLocation)
+                bundle.putParcelable("customerLocation", lastLocation)
                 detailerDetailDialog.arguments = bundle
                 detailerDetailDialog.show(
                     requireActivity().supportFragmentManager,
@@ -151,6 +155,22 @@ class CustomerHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerC
                 )
             }
         }
+
+        binding.distanceSeekbar.progress = 10
+        binding.distanceTv.text =  "${binding.distanceSeekbar.progress} KM"
+
+        binding.distanceSeekbar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                binding.distanceTv.text =  "${binding.distanceSeekbar.progress} KM"
+                distance = p1
+            }
+
+            override fun onStartTrackingTouch(p0: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(p0: SeekBar?) {
+            }
+        })
 
         return root
     }
@@ -169,6 +189,25 @@ class CustomerHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerC
 
         if (onlineDetailerList?.size != 0) {
             for (detailer in onlineDetailerList!!) {
+
+                if (this::lastLocation.isInitialized) {
+                    val startLocation = Location("myLocation")
+                    startLocation.latitude = lastLocation.latitude
+                    startLocation.longitude = lastLocation.longitude
+
+                    val detailerLocation = Location("detailerLocation")
+                    detailerLocation.latitude = detailer.currentLat
+                    detailerLocation.longitude = detailer.currentLong
+
+                    val calculatedDistance = startLocation.distanceTo(detailerLocation) / 1000 //in Km
+                    Log.e(TAG,"Distance = ${calculatedDistance.toInt()}")
+                    Log.e(TAG,"Custom Distance = $distance")
+                    if (calculatedDistance.toInt() > distance) {
+                        //Skip detailers those are far away more than 10KMs
+                        continue
+                    }
+                }
+
                 val marker = MarkerOptions()
                 marker.position(LatLng(detailer.currentLat, detailer.currentLong))
                 marker.title(detailer.firstName + " " + detailer.lastName)
@@ -193,7 +232,20 @@ class CustomerHomeFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerC
             val bounds: LatLngBounds = boundBuilder.build()
             val padding = 100
             val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding)
-            mMap.animateCamera(cameraUpdate)
+
+            if(markerList.size == 0){
+                mMap.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            lastLocation.latitude,
+                            lastLocation.longitude
+                        ), 12f
+                    )
+                )
+            }
+            else{
+                mMap.animateCamera(cameraUpdate)
+            }
         } else {
             if (this::lastLocation.isInitialized) {
                 mMap.animateCamera(
